@@ -1,0 +1,7 @@
+Word Ladder: hit -> cog
+Word List: ['hot', 'dot', 'dog', 'lot', 'log', 'cog']
+
+Found 2 shortest path(s):
+
+Path 1: hit -> hot -> dot -> dog -> cog
+Path 2: hit -> hot -> lot -> log -> cog

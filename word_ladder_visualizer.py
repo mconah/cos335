@@ -1,4 +1,6 @@
 import networkx as nx
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for saving files
 import matplotlib.pyplot as plt
 import time
 from typing import List, Dict
@@ -26,14 +28,18 @@ def create_word_ladder_graph(begin_word: str, word_set: set, parents: Dict[str, 
     return G
 
 
-def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[str]):
-    """Run the full algorithm and show animated visualization of BFS + paths."""
+def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[str], save_dir: str = "output"):
+    """Run the full algorithm and save visualization images to a directory."""
+    import os
     # Import your main functions (assume they are in the same folder or same file)
     # If your 20 functions + find_ladders are in a file called word_ladder.py, do:
     # from word_ladder import find_ladders, create_word_set, ... (or just paste them here)
     
     # For simplicity, we'll re-use the logic but add pauses for visualization
     from collections import deque, defaultdict
+    
+    # Create output directory
+    os.makedirs(save_dir, exist_ok=True)
     
     word_set = set(word_list)
     if end_word not in word_set:
@@ -60,7 +66,7 @@ def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[st
     level = 0
     found = False
     
-    plt.figure(figsize=(12, 8))
+    frame_count = 0
     
     while queue and not found:
         level_size = len(queue)
@@ -74,10 +80,16 @@ def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[st
             node_colors = ['lightblue' if n != current else 'orange' for n in G_full.nodes()]
             edge_colors = ['gray'] * len(G_full.edges())
             
+            plt.figure(figsize=(12, 8))
             nx.draw(G_full, pos, node_color=node_colors, edge_color=edge_colors,
                     with_labels=True, node_size=800, font_size=10, alpha=0.8)
             plt.title(f"BFS Level {level} - Processing: {current}")
-            plt.pause(0.8)  # Real-time pause so you can see it
+            
+            # Save frame instead of showing
+            frame_path = os.path.join(save_dir, f"bfs_frame_{frame_count:03d}.png")
+            plt.savefig(frame_path)
+            plt.close()
+            frame_count += 1
             
             for i in range(len(current)):
                 for ch in "abcdefghijklmnopqrstuvwxyz":
@@ -93,7 +105,6 @@ def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[st
         
         visited.update(new_visited)
         level += 1
-        plt.pause(0.5)
     
     plt.close()
     
@@ -109,12 +120,15 @@ def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[st
     nx.draw(G, pos, with_labels=True, node_color='lightgreen', 
             node_size=900, font_size=9, arrows=True, arrowstyle='->')
     plt.title("Shortest Path DAG (Parents Map) - Arrows show possible previous words")
-    plt.show()
+    dag_path = os.path.join(save_dir, "shortest_path_dag.png")
+    plt.savefig(dag_path)
+    plt.close()
+    print(f"Saved DAG visualization to {dag_path}")
     
     # --- Highlight All Shortest Paths One by One ---
     all_paths = find_ladders(begin_word, end_word, word_list)  # Use your main function
     
-    print(f"\nFound {len(all_paths)} shortest path(s). Visualizing them one by one...\n")
+    print(f"\nFound {len(all_paths)} shortest path(s). Saving visualizations...\n")
     
     for idx, path in enumerate(all_paths):
         print(f"Path {idx+1}: {' → '.join(path)}")
@@ -129,8 +143,20 @@ def visualize_bfs_exploration(begin_word: str, end_word: str, word_list: List[st
         nx.draw_networkx_edges(G_full, pos, edgelist=path_edges, edge_color='red', width=3)
         
         plt.title(f"Shortest Path {idx+1} of {len(all_paths)}: {' → '.join(path)}")
-        plt.pause(2.0)   # Show each path for 2 seconds
-        plt.show()       # Keep the window open until closed manually
+        path_image_path = os.path.join(save_dir, f"path_{idx+1}.png")
+        plt.savefig(path_image_path)
+        plt.close()
+        print(f"  Saved to {path_image_path}")
+    
+    # Also save a summary text file
+    summary_path = os.path.join(save_dir, "summary.txt")
+    with open(summary_path, 'w') as f:
+        f.write(f"Word Ladder: {begin_word} -> {end_word}\n")
+        f.write(f"Word List: {word_list}\n\n")
+        f.write(f"Found {len(all_paths)} shortest path(s):\n\n")
+        for idx, path in enumerate(all_paths):
+            f.write(f"Path {idx+1}: {' -> '.join(path)}\n")
+    print(f"\nSaved summary to {summary_path}")
 
 
 # ================================================
