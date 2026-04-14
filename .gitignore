@@ -1,8 +1,47 @@
-```
-# Compiled Python files
+```gitignore
+# Compiled and build artifacts
 *.pyc
 __pycache__/
 
-# Output directory for generated images and files
-output/
+# Dependencies
+.venv/
+venv/
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Distribution artifacts
+dist/
+build/
+*.egg-info/
+*.whl
+*.tar.gz
+
+# Python specific
+.pytest_cache/
+.mypy_cache/
+*.pyd
+*.so
+*.dylib
+
+# System files
+.DS_Store
+Thumbs.db
 ```
